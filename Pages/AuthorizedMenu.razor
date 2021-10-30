@@ -1,0 +1,60 @@
+﻿@page "/AuthorizedMenu"
+
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+@inject BlogEditorAPIClient BlogEditorApi
+
+@attribute [Authorize]
+
+<div class="container text-center">
+    <div class="row">
+        @if (IsBlogAdminstrator)
+        {
+            <div class="col-sm-12 col-lg-4">
+                <NavLink href="BlogEditor" class="btn btn-info btn-block btn-lg my-1"
+                         title="Edit Blog">
+                    <img class="btn-icon" src="img/Blog.png" />
+                    <br />
+                    Blog Editor
+                </NavLink>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-lg-4">
+            <div class="form-group">
+                <input type="text" class="form-control"
+                       @bind="message"
+                       placeholder="Enter Message Here"
+                       title="Enter Message Here"
+                       @onkeyup="@(async (e) => {
+                                   if (!string.IsNullOrWhiteSpace(e.Key) && e.Key.Contains("Enter")) {
+                                       await TriggerMesssage();
+                                   }
+                               })" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code{
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private bool IsBlogAdminstrator = false;
+
+    private string message { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        IsBlogAdminstrator = (await AuthorizationService.AuthorizeAsync(user, "BlogAdministratorsOnly")).Succeeded;
+    }
+
+    protected async Task TriggerMesssage()
+    {
+        var result = await BlogEditorApi.TriggerMessage(message);
+
+        Console.WriteLine("Result : " + result);
+    }
+}

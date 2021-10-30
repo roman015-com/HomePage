@@ -1,0 +1,39 @@
+﻿@page "/SignalR"
+
+@inject HubConnection HubConnection
+
+<h3>SignalRTest</h3>
+
+<div>
+    @IncomingMessage
+</div>
+
+<div class="py-3">
+    Click <a href="https://roman015storage.blob.core.windows.net/test/test_event_modified.ics">Here</a> to download .ics file
+</div>
+
+@code {
+    string IncomingMessage { get; set; } = "No Message";
+
+    protected override async Task OnInitializedAsync()
+    {
+        #region HubConnection Setup
+        HubConnection.Closed += error =>
+        {
+            Console.Error.WriteLine("Hub Connection Closed, Reconnecting : " + error.Message);
+            Console.WriteLine("Hub Connection Closed, Reconnecting : " + error.Message);
+            return HubConnection.StartAsync();
+        };
+
+        IncomingMessage = "Connecting...";
+        await HubConnection.StartAsync();
+        IncomingMessage = "Connected, Listening...please wait.";
+        #endregion
+
+        HubConnection.On<string>("TestMessage", message =>
+        {
+            IncomingMessage = message;
+            StateHasChanged();
+        });
+    }
+}
