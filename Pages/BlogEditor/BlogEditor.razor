@@ -2,7 +2,7 @@
 @attribute [PermittedRoleAuthorize("BlogAdministrator")]
 
 @inject BlogEditorAPIClient BlogEditorApi
-@inject HttpClient Http
+@inject NotificationService NotificationService
 
 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
     <li class="nav-item">
@@ -29,7 +29,7 @@
     <div class="tab-pane fade show active" id="markdown" role="tabpanel" aria-labelledby="home-tab">
         <div class="input-group">
             <textarea class="form-control markDownInput" @bind="Post.PostMarkDown"></textarea>
-        </div>        
+        </div>
     </div>
     <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="profile-tab">
         @HtmlPreview
@@ -81,7 +81,8 @@
         Tags = new List<string>()
     };
 
-    public string PostTags {
+    public string PostTags
+    {
         get
         {
             return string.Join(",", Post.Tags);
@@ -119,10 +120,18 @@
     {
         string markdownFileString = "Title: " + Post.Title
                 + Environment.NewLine + "Published: " + Post.PublishedOn.ToString("MM/dd/yyyy")
-                + Environment.NewLine + "Tags:[" + string.Join(",", Post.Tags.Select(item => "\"" + item + "\"")) + "]" 
-                + Environment.NewLine + "---" 
+                + Environment.NewLine + "Tags:[" + string.Join(",", Post.Tags.Select(item => "\"" + item + "\"")) + "]"
+                + Environment.NewLine + "---"
                 + Environment.NewLine + Post.PostMarkDown;
 
         await BlogEditorApi.UploadPost(Post.ID, markdownFileString);
+
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Info,
+            Summary = "Info Summary",
+            Detail = "Info Detail",
+            Duration = 4000
+        });
     }
 }

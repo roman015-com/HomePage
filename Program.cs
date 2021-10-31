@@ -52,11 +52,8 @@ namespace HomePage
                 config.AddPolicy("BlogAdministratorsOnly", policy => policy.AddRequirements(new PermittedRoleRequirement("BlogAdministrator")));
             });
 
-            builder.Services.AddSingleton<HubConnection>(sp => {
-                return new HubConnectionBuilder()
-                  .WithUrl("https://api.roman015.com/NotificationHub")
-                  .WithAutomaticReconnect()
-                  .Build();
+            builder.Services.AddSingleton<TestSignalRHub>(sp => {
+                return TestSignalRHub.GetSingletonInstance();
             });
 
             #region For FE RBAC

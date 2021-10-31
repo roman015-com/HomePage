@@ -1,6 +1,6 @@
 ﻿@page "/SignalR"
 
-@inject HubConnection HubConnection
+@inject TestSignalRHub testSignalRHub
 
 <h3>SignalRTest</h3>
 
@@ -18,22 +18,21 @@
     protected override async Task OnInitializedAsync()
     {
         #region HubConnection Setup
-        HubConnection.Closed += error =>
+        testSignalRHub.Closed += error =>
         {
             Console.Error.WriteLine("Hub Connection Closed, Reconnecting : " + error.Message);
             Console.WriteLine("Hub Connection Closed, Reconnecting : " + error.Message);
-            return HubConnection.StartAsync();
         };
 
         IncomingMessage = "Connecting...";
-        await HubConnection.StartAsync();
+        testSignalRHub.StartConnection();
         IncomingMessage = "Connected, Listening...please wait.";
         #endregion
 
-        HubConnection.On<string>("TestMessage", message =>
+        testSignalRHub.TestMessage += (message) =>
         {
             IncomingMessage = message;
             StateHasChanged();
-        });
+        };
     }
 }
