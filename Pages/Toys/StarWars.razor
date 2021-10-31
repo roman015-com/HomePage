@@ -1,0 +1,79 @@
+﻿@page "/StarWars"
+
+@inject StarWarsHub StarWarsHub
+@inject DialogService DialogService
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h3>Star Wars</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <strong>Choose a Side, Force User</strong>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <button id="ButtonSith" class="btn btn-success">
+                <img class="btn-icon" src="/img/Yoda.png" @onclick="ChooseJedi" />
+            </button>
+        </div>
+
+        <div class="col-6">
+            <button id="ButtonSith" class="btn btn-success">
+                <img class="btn-icon" src="/img/Kyloren.png" @onclick="ChooseSith"/>
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        StarWarsHub.StartConnection();
+        StarWarsHub.OnOrder66Executed += async(jedi, sith) =>
+        {
+            await ShowOrder66Results(jedi, sith);
+        };
+    }
+
+    async Task ChooseSith()
+    {
+        await ChooseSide(false);
+    }
+
+    async Task ChooseJedi()
+    {
+        await ChooseSide(true);
+    }
+
+    async Task ChooseSide(bool isJedi = false)
+    {
+        StarWarsHub.JoinSide(isJedi);
+    }
+
+    async Task ShowOrder66Results(int jediCount, int sithCount)
+    {
+
+        var result = await DialogService.OpenAsync("Order 66 Has Been Executed!", ds =>
+        @<div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <img class="img-fluid" src="/img/Order66_Start.jpg" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div><strong>Emperor Palpatine has Spoken!</strong></div>
+                    <div>@jediCount Jedi have been Killed</div>
+                    <div>@sithCount Sith Have Won The Battle</div>
+                </div>
+            </div>    
+        </div>);
+    }
+}

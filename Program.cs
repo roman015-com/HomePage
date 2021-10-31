@@ -55,6 +55,9 @@ namespace HomePage
             builder.Services.AddSingleton<TestSignalRHub>(sp => {
                 return TestSignalRHub.GetSingletonInstance();
             });
+            builder.Services.AddSingleton<StarWarsHub>(sp => {
+                return StarWarsHub.GetSingletonInstance();
+            });
 
             #region For FE RBAC
             builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermittedRolePolicyProvider>();
