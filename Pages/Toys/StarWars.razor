@@ -3,6 +3,8 @@
 @inject StarWarsHub StarWarsHub
 @inject DialogService DialogService
 
+@implements IDisposable
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -42,6 +44,11 @@
         };
     }
 
+    public void Dispose()
+    {
+        StarWarsHub.LeaveSide();
+    }
+
     async Task ChooseSith()
     {
         await ChooseSide(false);
@@ -54,6 +61,7 @@
 
     async Task ChooseSide(bool isJedi = false)
     {
+        StarWarsHub.LeaveSide();
         StarWarsHub.JoinSide(isJedi);
     }
 
