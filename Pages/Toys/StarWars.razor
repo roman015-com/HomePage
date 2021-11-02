@@ -27,8 +27,14 @@
 
         <div class="col-6">
             <button id="ButtonSith" class="btn btn-success">
-                <img class="btn-icon" src="/img/Kyloren.png" @onclick="ChooseSith"/>
+                <img class="btn-icon" src="/img/Kyloren.png" @onclick="ChooseSith" />
             </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <strong>@Choice</strong>
         </div>
     </div>
 </div>
@@ -43,6 +49,8 @@
             await ShowOrder66Results(jedi, sith);
         };
     }
+
+    string Choice = "";
 
     void IDisposable.Dispose()
     {
@@ -62,11 +70,26 @@
     async Task ChooseSide(bool isJedi = false)
     {
         StarWarsHub.JoinSide(isJedi);
+        if (string.IsNullOrEmpty(Choice) || !Choice.StartsWith("You are a"))
+        {
+            Choice = isJedi ? "You are a JEDI!" : "You are a SITH!";
+        }
     }
 
     async Task ShowOrder66Results(int jediCount, int sithCount)
     {
-
+        if(Choice.Contains("JEDI"))
+        {
+            Choice = "You've Died!";
+        }
+        else if(Choice.Contains("SITH"))
+        {
+            Choice = "Glory to the Empire!";
+        }
+        else
+        {
+            Choice = "You've been frozen in Carbonite!";
+        }
         var result = await DialogService.OpenAsync("Order 66 Has Been Executed!", ds =>
         @<div class="container-fluid">
             <div class="row">
