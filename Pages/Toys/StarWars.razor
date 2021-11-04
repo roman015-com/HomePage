@@ -70,10 +70,7 @@
     async Task ChooseSide(bool isJedi = false)
     {
         StarWarsHub.JoinSide(isJedi);
-        if (string.IsNullOrEmpty(Choice) || !Choice.StartsWith("You are a"))
-        {
-            Choice = isJedi ? "You are a JEDI!" : "You are a SITH!";
-        }
+        Choice = isJedi ? "You are a JEDI!" : "You are a SITH!";
     }
 
     async Task ShowOrder66Results(int jediCount, int sithCount)
