@@ -20,14 +20,14 @@
 
     <div class="row">
         <div class="col-6">
-            <button id="ButtonSith" class="btn btn-success">
-                <img class="btn-icon" src="/img/Yoda.png" @onclick="ChooseJedi" />
+            <button id="ButtonSith" class="btn btn-success" @onclick="ChooseJedi">
+                <img class="btn-icon" src="/img/Yoda.png" />
             </button>
         </div>
 
         <div class="col-6">
-            <button id="ButtonSith" class="btn btn-success">
-                <img class="btn-icon" src="/img/Kyloren.png" @onclick="ChooseSith" />
+            <button id="ButtonSith" class="btn btn-success" @onclick="ChooseSith">
+                <img class="btn-icon" src="/img/Kyloren.png" />
             </button>
         </div>
     </div>
@@ -77,16 +77,20 @@
     {
         if(Choice.Contains("JEDI"))
         {
+            Console.WriteLine("This is the Jedi you're looking for");
             Choice = "You've Died!";
         }
         else if(Choice.Contains("SITH"))
         {
+            Console.WriteLine("The Jedi have died");
             Choice = "Glory to the Empire!";
         }
         else
         {
+            Console.WriteLine("Hey Guys, We Found Hans Solo!");
             Choice = "You've been frozen in Carbonite!";
         }
+        StateHasChanged();
         var result = await DialogService.OpenAsync("Order 66 Has Been Executed!", ds =>
         @<div class="container-fluid">
             <div class="row">
