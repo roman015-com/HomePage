@@ -44,13 +44,14 @@
     protected override async Task OnInitializedAsync()
     {
         StarWarsHub.StartConnection();
-        StarWarsHub.OnOrder66Executed += async(jedi, sith) =>
+        StarWarsHub.OnOrder66Executed += async (jedi, sith) =>
         {
             await ShowOrder66Results(jedi, sith);
         };
     }
 
     string Choice = "";
+    bool IsDialogOpen = false;
 
     void IDisposable.Dispose()
     {
@@ -75,12 +76,12 @@
 
     async Task ShowOrder66Results(int jediCount, int sithCount)
     {
-        if(Choice.Contains("JEDI"))
+        if (Choice.Contains("JEDI"))
         {
             Console.WriteLine("This is the Jedi you're looking for");
             Choice = "You've Died!";
         }
-        else if(Choice.Contains("SITH"))
+        else if (Choice.Contains("SITH"))
         {
             Console.WriteLine("The Jedi have died");
             Choice = "Glory to the Empire!";
@@ -91,20 +92,25 @@
             Choice = "You've been frozen in Carbonite!";
         }
         StateHasChanged();
-        var result = await DialogService.OpenAsync("Order 66 Has Been Executed!", ds =>
-        @<div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <img class="img-fluid" src="/img/Order66_Start.jpg" />
+        if (!IsDialogOpen)
+        {
+            IsDialogOpen = true;
+            var result = await DialogService.OpenAsync("Order 66 Has Been Executed!", ds =>
+            @<div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <img class="img-fluid" src="/img/Order66_Start.jpg" />
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div><strong>Emperor Palpatine has Spoken!</strong></div>
-                    <div>@jediCount Jedi have been Killed</div>
-                    <div>@sithCount Sith Have Won The Battle</div>
+                <div class="row">
+                    <div class="col-12">
+                        <div><strong>Emperor Palpatine has Spoken!</strong></div>
+                        <div>@jediCount Jedi have been Killed</div>
+                        <div>@sithCount Sith Have Won The Battle</div>
+                    </div>
                 </div>
-            </div>    
-        </div>);
+            </div>);
+            IsDialogOpen = false;
+        }
     }
 }
