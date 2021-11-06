@@ -1,8 +1,7 @@
 ﻿@page "/StarWars"
 
 @inject StarWarsHub StarWarsHub
-@inject DialogService DialogService
-
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="container-fluid">
@@ -45,10 +44,41 @@
     </div>
 </div>
 
+<div class="modal fade" id="Order66Modal" tabindex="-1" role="dialog" aria-labelledby="Order66ModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Order 66 Has Been Executed!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <img class="img-fluid" src="/img/Order66_Start.jpg" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div><strong>Emperor Palpatine has Spoken!</strong></div>
+                            <div>@JediCount Jedi have been Killed</div>
+                            <div>@SithCount Sith Have Won The Battle</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @code {
 
     protected override async Task OnInitializedAsync()
     {
+        jsStarWarsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", StarWarsJSUrl);
+
         StarWarsHub.StartConnection();
         StarWarsHub.OnOrder66Executed += async (jedi, sith) =>
         {
@@ -57,7 +87,11 @@
     }
 
     string Choice = "";
-    bool IsDialogOpen = false;
+
+    private string StarWarsJSUrl = "./js/StarWars.js";
+    IJSObjectReference jsStarWarsModule;
+    int JediCount = 0;
+    int SithCount = 0;
 
     void IDisposable.Dispose()
     {
@@ -97,26 +131,12 @@
             Console.WriteLine("Hey Guys, We Found Hans Solo!");
             Choice = "You've been frozen in Carbonite!";
         }
+
+        JediCount = jediCount;
+        SithCount = sithCount;
+
         StateHasChanged();
-        if (!IsDialogOpen)
-        {
-            IsDialogOpen = true;
-            var result = await DialogService.OpenAsync("Order 66 Has Been Executed!", ds =>
-            @<div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <img class="img-fluid" src="/img/Order66_Start.jpg" />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div><strong>Emperor Palpatine has Spoken!</strong></div>
-                        <div>@jediCount Jedi have been Killed</div>
-                        <div>@sithCount Sith Have Won The Battle</div>
-                    </div>
-                </div>
-            </div>);
-            IsDialogOpen = false;
-        }
+
+        await jsStarWarsModule.InvokeVoidAsync("TriggerModal");
     }
 }

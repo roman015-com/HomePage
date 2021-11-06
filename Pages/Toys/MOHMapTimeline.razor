@@ -21,7 +21,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex justify-content-center py-2">
-                                <button class="btn btn-success" @onclick="(async() => await LoadBingMapsJs())">I Agree</button>
+                                <button class="btn btn-success" @onclick="(() => LoadBingMapsJs())">I Agree</button>
                             </div>
                         </div>
                     </div>
@@ -41,9 +41,10 @@
                 </span>
                 <span class="font-weight-bold">
                     <span>
-                        <RadzenDatePicker @bind-Value=@CurrentDateTime DateFormat="dd MMM yyyy"
-                                          DateRender=@DateRender  
-                                          Change=@(async args => await OnChange(args, "DatePicker", "MM/dd/yyyy")) />
+                        <input type="date" 
+                               @bind="@CurrentDateTime" 
+                               max="@MaxDateTime"
+                               min="@MinDateTime"/>
                     </span>                    
                 </span>
                 <span class="px-2 @(HideOnMaxDateClass())">
@@ -140,7 +141,12 @@
 
     DateTime MinDateTime = DateTime.Today;
     DateTime MaxDateTime = DateTime.Today;
-    DateTime CurrentDateTime = DateTime.Today;
+    DateTime _CurrentDateTime = DateTime.Today;
+    DateTime CurrentDateTime
+    {
+        get => _CurrentDateTime;
+        set => OnChange(value);
+    }
 
     List<VisitedSite> visitedSites = new List<VisitedSite>();
     List<VisitedSite> SelectedVisits = new List<VisitedSite>();
@@ -177,53 +183,60 @@
         MaxDateTime = visitedSites.First().Date.Date;
         CurrentDateTime = MaxDateTime;
 
+        StateHasChanged();
+
         await LoadPinsFor(CurrentDateTime);
     }
 
     private async Task IncrementDate()
     {
-        CurrentDateTime = CurrentDateTime.AddDays(1);
-        if (CurrentDateTime.Date >= MaxDateTime.Date)
+        _CurrentDateTime = _CurrentDateTime.AddDays(1);
+        if (_CurrentDateTime.Date >= MaxDateTime.Date)
         {
-            CurrentDateTime = MaxDateTime;
+            _CurrentDateTime = MaxDateTime;
+        }
+
+        if (_CurrentDateTime.Date <= MinDateTime.Date)
+        {
+            _CurrentDateTime = MinDateTime;
         }
 
         await RemoveAllPins();
-        await LoadPinsFor(CurrentDateTime);
+        await LoadPinsFor(_CurrentDateTime);
     }
 
     private async Task DecrementDate()
     {
-        CurrentDateTime = CurrentDateTime.AddDays(-1);
-        if (CurrentDateTime.Date <= MinDateTime.Date)
+        _CurrentDateTime = _CurrentDateTime.AddDays(-1);
+        if (_CurrentDateTime.Date <= MinDateTime.Date)
         {
-            CurrentDateTime = MinDateTime;
+            _CurrentDateTime = MinDateTime;
+        }
+
+        if (_CurrentDateTime.Date >= MaxDateTime.Date)
+        {
+            _CurrentDateTime = MaxDateTime;
         }
 
         await RemoveAllPins();
-        await LoadPinsFor(CurrentDateTime);
+        await LoadPinsFor(_CurrentDateTime);
     }
 
-    private void DateRender(DateRenderEventArgs args)
+    private async Task OnChange(DateTime changedValue)
     {
-        args.Disabled = !(MinDateTime.Date <= args.Date.Date && args.Date.Date <= MaxDateTime.Date);
-    }
-
-    private async Task OnChange(DateTime? value, string name, string format)
-    {
-        CurrentDateTime = value.Value;
-        if (CurrentDateTime.Date <= MinDateTime.Date)
+        _CurrentDateTime = changedValue;
+        if (_CurrentDateTime.Date <= MinDateTime.Date)
         {
-            CurrentDateTime = MinDateTime;
+            _CurrentDateTime = MinDateTime;
         }
 
-        if (CurrentDateTime.Date >= MaxDateTime.Date)
+        if (_CurrentDateTime.Date >= MaxDateTime.Date)
         {
-            CurrentDateTime = MaxDateTime;
+            _CurrentDateTime = MaxDateTime;
         }
 
         await RemoveAllPins();
-        await LoadPinsFor(CurrentDateTime);
+        await LoadPinsFor(_CurrentDateTime);
     }
 
     private async Task LoadPinsFor(DateTime selectedDateTime)
