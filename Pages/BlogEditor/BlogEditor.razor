@@ -2,7 +2,6 @@
 @attribute [PermittedRoleAuthorize("BlogAdministrator")]
 
 @inject BlogEditorAPIClient BlogEditorApi
-@inject NotificationService NotificationService
 
 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
     <li class="nav-item">
@@ -61,7 +60,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">Published On</span>
             </div>
-            <RadzenDatePicker @bind-Value=@(Post.PublishedOn) DateFormat="dd MMM yyyy" />
+            <input type="date" @bind="@(Post.PublishedOn)"/>
         </div>
 
         <div class="form-group d-flex  justify-content-center py-2">
@@ -126,12 +125,12 @@
 
         await BlogEditorApi.UploadPost(Post.ID, markdownFileString);
 
-        NotificationService.Notify(new NotificationMessage
-        {
-            Severity = NotificationSeverity.Info,
-            Summary = "Save Post",
-            Detail = "Post Saved Successfully",
-            Duration = 4000
-        });
+        //NotificationService.Notify(new NotificationMessage
+        //{
+        //    Severity = NotificationSeverity.Info,
+        //    Summary = "Save Post",
+        //    Detail = "Post Saved Successfully",
+        //    Duration = 4000
+        //});
     }
 }

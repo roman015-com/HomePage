@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Radzen;
 using Roman015API.Clients;
 using System;
 using System.Collections.Generic;
@@ -28,7 +27,6 @@ namespace HomePage
             });
 
             Roman015APIClientSetup(builder);
-            RadzenSetup(builder);
             BlazoredLocalStorageSetup(builder);
 
             await builder.Build().RunAsync();
@@ -65,14 +63,6 @@ namespace HomePage
             #endregion
 
             builder.Services.AddScoped<BlogEditorAPIClient>();
-        }
-
-        public static void RadzenSetup(WebAssemblyHostBuilder builder)
-        {
-            builder.Services.AddScoped<DialogService>();
-            builder.Services.AddScoped<NotificationService>();
-            builder.Services.AddScoped<TooltipService>();
-            builder.Services.AddScoped<ContextMenuService>();
         }
 
         public static void BlazoredLocalStorageSetup(WebAssemblyHostBuilder builder)
