@@ -33,7 +33,6 @@ jobs:
           ###### End of Repository/Build Configurations ######
         env:
           PRE_BUILD_COMMAND: dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }}  --store-password-in-clear-text --name "Roman015Github" "https://nuget.pkg.github.com/roman015-com/index.json"
-          POST_BUILD_COMMAND: echo POST BUILD COMMANDS FOR GITHUB; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/THIS_IS_A_TEST/g' ./wwwroot/_framework/blazor.webassembly.js; 
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
