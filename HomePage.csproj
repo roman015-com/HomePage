@@ -47,11 +47,11 @@
   <Target Name="Test" BeforeTargets="Publish">
     <Exec Command="echo BEFORE PUBLISH COMMANDS" Condition="'$(OS)' != 'Windows_NT'" />
     
-    <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var p = r.loadResource(o,t(o),e[o],n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, o, x);}}); return p;/g' blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var\sp\s=\sr\.loadResource(o,t(o),e\[o\],n);\sp\.response\.then((x)\s=&gt;\s{\sif\s(typeof\swindow\.loadResourceCallback\s===\s''function'')\s{\swindow\.loadResourceCallback(Object\.keys(e)\.length,o,x);}});\sreturn\sp;/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
     
-    <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; rm blazor.webassembly.js.*" Condition="'$(OS)' != 'Windows_NT'"/>
-
-    <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; gzip blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>    
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.*" Condition="'$(OS)' != 'Windows_NT'"/>
+  
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; gzip ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>    
     
     <Exec Command="echo BEFORE PUBLISH COMMANDS COMPLETED" Condition="'$(OS)' != 'Windows_NT'" />
   </Target>
