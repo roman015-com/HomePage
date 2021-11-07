@@ -54,9 +54,7 @@
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; echo COUNT &#xD;&#xA;&#xD;&#xA; cat ./wwwroot/_framework/blazor.webassembly.js | grep 'THIS_IS_A_TEST' -c &#xD;&#xA;&#xD;&#xA;echo END COUNT" Condition="'$(OS)' != 'Windows_NT'"/>
     <Exec Command="cd /bin/staticsites/ss-oryx/app/ &#xD;&#xA;&#xD;&#xA; echo COUNT &#xD;&#xA;&#xD;&#xA; cat /bin/staticsites/ss-oryx/app/wwwroot/_framework/blazor.webassembly.js | grep 'THIS_IS_A_TEST' -c &#xD;&#xA;&#xD;&#xA;echo END COUNT" Condition="'$(OS)' != 'Windows_NT'"/>
 
-    <Exec Command="ls -l $(PublishDir)" Condition="'$(OS)' != 'Windows_NT'"/>
-
-    <Exec Command="ls -l $(PublishDir)/wwwroot/_framework/" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.*" Condition="'$(OS)' != 'Windows_NT'"/>
     
     <Exec Command="echo BEFORE PUBLISH COMMANDS COMPLETED" Condition="'$(OS)' != 'Windows_NT'" />
   </Target>
