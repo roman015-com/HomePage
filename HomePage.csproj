@@ -34,7 +34,10 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo POST BUILD COMMANDS FOR WINDOWS&#xD;&#xA;&#xD;&#xA;cd $(TargetDir)&#xD;&#xA;&#xD;&#xA;powershell -Command &quot;$txt=(Get-Content .\wwwroot\_framework\blazor.webassembly.js);$txt = $txt.Replace('return r.loadResource(o,t(o),e[o],n)','var p = r.loadResource(o,t(o),e[o],n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, o, x);}}); return p;'); Set-Content -Path  .\wwwroot\_framework\blazor.webassembly.js -Value $txt&quot;&#xD;&#xA;&#xD;&#xA;echo POST BUILD COMMANDS FOR WINDOWS COMPLETE" Condition="'$(OS)' == 'Windows_NT' "/>
+    <Exec Command="echo POST BUILD COMMANDS FOR WINDOWS&#xD;&#xA;&#xD;&#xA;cd $(TargetDir)&#xD;&#xA;&#xD;&#xA;powershell -Command &quot;$txt=(Get-Content .\wwwroot\_framework\blazor.webassembly.js);$txt = $txt.Replace('return r.loadResource(o,t(o),e[o],n)','var p = r.loadResource(o,t(o),e[o],n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, o, x);}}); return p;'); Set-Content -Path  .\wwwroot\_framework\blazor.webassembly.js -Value $txt&quot;&#xD;&#xA;&#xD;&#xA;echo POST BUILD COMMANDS FOR WINDOWS COMPLETE" Condition="'$(OS)' == 'Windows_NT' "/>    
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="Publish">
     <Exec Command="echo POST BUILD COMMANDS FOR LINUX&#xD;&#xA;&#xD;&#xA;cd $(TargetDir)&#xD;&#xA;&#xD;&#xA; cd ./wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/THIS_IS_A_TEST/g' blazor.webassembly.js &#xD;&#xA;&#xD;&#xA; echo COUNT &#xD;&#xA;&#xD;&#xA; cat blazor.webassembly.js | grep 'THIS_IS_A_TEST' -c &#xD;&#xA;&#xD;&#xA;echo END COUNT &#xD;&#xA;&#xD;&#xA; echo POST BUILD COMMANDS FOR LINUX COMPLETE" Condition="'$(OS)' != 'Windows_NT'"/>
   </Target>
 
