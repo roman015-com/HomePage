@@ -27,19 +27,16 @@
             <div class="container text-center">
                 <div class="row">
                     <div class="col">
-                        <div class="text-center">
-                            <div class="spinner-border" style="width: 7rem; height: 7rem;" role="status">
-                                <span class="sr-only">Loading...</span>
+                        <div class="text-center">                            
+                            <span id="progressText">Loading Blazor WebAssembly...</span>
+                            <br />
+                            <div class="progress">
+                                <div id="progressbar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        (Please Wait, Loading Experiments...)
-                    </div>
-                </div>
-        </div>
+            </div>
     </app>
 
     <div id="blazor-error-ui">
@@ -48,6 +45,32 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <script type="text/javascript">
+        // https://stef-heyenrath.medium.com/show-a-loading-progress-indicator-for-a-blazor-webassembly-application-ea28595ff8c1
+        var i = 0;
+        window.loadResourceCallback = (total, name, response) => {
+            if (name.endsWith('.dll')) {
+                i++;
+                const value = parseInt((i * 100.0) / total);
+                const pct = value + '%';
+
+                const progressbar = document.getElementById('progressbar');
+                progressbar.style.width = pct;
+                progressbar.innerText = pct;
+                console.log(i + '/' + total + ' (' + pct + ') ' + name);
+
+                const progressText = document.getElementById('progressText');
+                if (value < 95) {
+                    progressText.innerText = "Loading Blazor WebAssembly...";
+                } else if (95 <= value && value < 100) {
+                    progressText.innerText = "Almost done...";
+                } else {
+                    progressText.innerText = "Starting";
+                }
+                
+            }
+        }
+    </script>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 
