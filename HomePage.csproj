@@ -5,6 +5,7 @@
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>link</TrimMode>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,5 +32,9 @@
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="echo POST BUILD COMMANDS&#xD;&#xA;&#xD;&#xA;cd $(TargetDir)&#xD;&#xA;&#xD;&#xA;powershell -Command &quot;$txt=(Get-Content .\wwwroot\_framework\blazor.webassembly.js);$txt = $txt.Replace('return r.loadResource(o,t(o),e[o],n)','var p = r.loadResource(o,t(o),e[o],n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, o, x);}}); return p;'); Set-Content -Path  .\wwwroot\_framework\blazor.webassembly.js -Value $txt&quot;&#xD;&#xA;&#xD;&#xA;echo POST BUILD COMMANDS COMPLETE" />
+  </Target>
 
 </Project>
