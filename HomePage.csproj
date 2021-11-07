@@ -52,6 +52,7 @@
     
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/THIS_IS_A_TEST/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; echo COUNT &#xD;&#xA;&#xD;&#xA; cat ./wwwroot/_framework/blazor.webassembly.js | grep 'THIS_IS_A_TEST' -c &#xD;&#xA;&#xD;&#xA;echo END COUNT" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd /bin/staticsites/ss-oryx/app/ &#xD;&#xA;&#xD;&#xA; echo COUNT &#xD;&#xA;&#xD;&#xA; cat ./wwwroot/_framework/blazor.webassembly.js | grep 'THIS_IS_A_TEST' -c &#xD;&#xA;&#xD;&#xA;echo END COUNT" Condition="'$(OS)' != 'Windows_NT'"/>
 
     <Exec Command="echo AFTER PUBLISH COMMANDS COMPLETED" Condition="'$(OS)' != 'Windows_NT'" />
   </Target>
