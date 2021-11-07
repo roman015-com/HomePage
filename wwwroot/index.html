@@ -28,8 +28,7 @@
                 <div class="row">
                     <div class="col">
                         <div class="text-center">                            
-                            <p></p>
-                            Loading Blazor WebAssembly...
+                            <span id="progressText">Loading Blazor WebAssembly...</span>
                             <br />
                             <div class="progress">
                                 <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" style="width:0"></div>
@@ -57,7 +56,18 @@
 
                 const progressbar = document.getElementById('progressbar');
                 progressbar.style.width = pct;
+                progressbar.innerText = pct;
                 console.log(i + '/' + total + ' (' + pct + ') ' + name);
+
+                const progressText = document.getElementById('progressText');
+                if (value < 95) {
+                    progressText.innerText = "Loading Blazor WebAssembly...";
+                } else if (95 <= value && value < 100) {
+                    progressText.innerText = "Almost done...";
+                } else {
+                    progressText.innerText = "(Any moment now)";
+                }
+                
             }
         }
     </script>
