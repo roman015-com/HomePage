@@ -47,9 +47,10 @@
   <Target Name="Test" BeforeTargets="Publish">
     <Exec Command="echo BEFORE PUBLISH COMMANDS" Condition="'$(OS)' != 'Windows_NT'" />
     
-    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var\sp\s=\sr\.loadResource(o,t(o),e\[o\],n);\sp\.response\.then((x)\s=&gt;\s{\sif\s(typeof\swindow\.loadResourceCallback\s===\s''function'')\s{\swindow\.loadResourceCallback(Object\.keys(e)\.length,o,x);}});\sreturn\sp;/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var\sp\s=\sr\.loadResource(o,t(o),e\[o\],n);/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
     
-    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.*" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.gz" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.br" Condition="'$(OS)' != 'Windows_NT'"/>
   
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; gzip ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>    
     
