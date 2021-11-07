@@ -47,7 +47,7 @@
   <Target Name="Test" BeforeTargets="Publish">
     <Exec Command="echo BEFORE PUBLISH COMMANDS" Condition="'$(OS)' != 'Windows_NT'" />
     
-    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var\sp\s=\sr\.loadResource(o,t(o),e\[o\],n);/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var p = r\.loadResource(o,t(o),e[o],n); p\.response\.then((x) =&gt; { if (typeof window\.loadResourceCallback === &quot;function&quot;) { window\.loadResourceCallback(Object\.keys(e)\.length,o,x);}}); return p;/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
     
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.gz" Condition="'$(OS)' != 'Windows_NT'"/>
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.br" Condition="'$(OS)' != 'Windows_NT'"/>
