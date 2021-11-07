@@ -55,11 +55,9 @@
                 const pct = value + '%';
 
                 const progressbar = document.getElementById('progressbar');
-                if (value > 10) {
-                    progressbar.style.width = pct;
-                    progressbar.innerText = pct;
-                    console.log(i + '/' + total + ' (' + pct + ') ' + name);
-                }
+                progressbar.style.width = pct;
+                progressbar.innerText = pct;
+                console.log(i + '/' + total + ' (' + pct + ') ' + name);
 
                 const progressText = document.getElementById('progressText');
                 if (value < 95) {
@@ -67,7 +65,7 @@
                 } else if (95 <= value && value < 100) {
                     progressText.innerText = "Almost done...";
                 } else {
-                    progressText.innerText = "Starting Website";
+                    progressText.innerText = "Starting";
                 }
                 
             }
