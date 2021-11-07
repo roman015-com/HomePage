@@ -34,27 +34,24 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo POST BUILD COMMANDS" Condition="'$(OS)' == 'Windows_NT'"/>
-    
     <Exec Command="echo BUILD OS : WINDOWS" Condition="'$(OS)' == 'Windows_NT'" />
-    <Exec Command="echo BUILD OS : LINUX" Condition="'$(OS)' != 'Windows_NT'" />
-    
+
+    <Exec Command="echo Modifying \wwwroot\_framework\blazor.webassembly.js" Condition="'$(OS)' == 'Windows_NT'" />    
     <Exec Command="cd $(TargetDir) &#xD;&#xA;&#xD;&#xA;  powershell -Command &quot;$txt=(Get-Content .\wwwroot\_framework\blazor.webassembly.js);$txt = $txt.Replace('return r.loadResource(o,t(o),e[o],n)','var p = r.loadResource(o,t(o),e[o],n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, o, x);}}); return p;'); Set-Content -Path  .\wwwroot\_framework\blazor.webassembly.js -Value $txt&quot;" Condition="'$(OS)' == 'Windows_NT' "/>    
-    
-    <Exec Command="echo POST BUILD COMMANDS COMPLETED" Condition="'$(OS)' == 'Windows_NT'"/>
   </Target>
   
   <Target Name="Test" BeforeTargets="Publish">
-    <Exec Command="echo BEFORE PUBLISH COMMANDS" Condition="'$(OS)' != 'Windows_NT'" />
-    
+    <Exec Command="echo BUILD OS : LINUX" Condition="'$(OS)' != 'Windows_NT'" />
+
+    <Exec Command="echo Modifying \wwwroot\_framework\blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
     <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/var p = r\.loadResource(o,t(o),e[o],n); p\.response\.then((x) =&gt; { if (typeof window\.loadResourceCallback === &quot;function&quot;) { window\.loadResourceCallback(Object\.keys(e)\.length,o,x);}}); return p;/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
-    
-    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.gz" Condition="'$(OS)' != 'Windows_NT'"/>
-    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; rm ./wwwroot/_framework/blazor.webassembly.js.br" Condition="'$(OS)' != 'Windows_NT'"/>
-  
-    
-    
-    <Exec Command="echo BEFORE PUBLISH COMMANDS COMPLETED" Condition="'$(OS)' != 'Windows_NT'" />
+
+    <Exec Command="echo Deleting Previous Compressed versions of blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; rm blazor.webassembly.js.gz" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; rm blazor.webassembly.js.br" Condition="'$(OS)' != 'Windows_NT'"/>
+
+    <Exec Command="echo Creating new gzip of blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; gzip blazor.webassembly.js -k" Condition="'$(OS)' != 'Windows_NT'"/>    
   </Target>
 
 </Project>
