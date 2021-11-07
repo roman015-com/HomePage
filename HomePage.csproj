@@ -41,8 +41,7 @@
     
     <Exec Command="cd $(TargetDir) &#xD;&#xA;&#xD;&#xA;  powershell -Command &quot;$txt=(Get-Content .\wwwroot\_framework\blazor.webassembly.js);$txt = $txt.Replace('return r.loadResource(o,t(o),e[o],n)','var p = r.loadResource(o,t(o),e[o],n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, o, x);}}); return p;'); Set-Content -Path  .\wwwroot\_framework\blazor.webassembly.js -Value $txt&quot;" Condition="'$(OS)' == 'Windows_NT' "/>    
     
-    <Exec Command="cd $(TargetDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/return\sr\.loadResource(o,t(o),e\[o\],n)/THIS_IS_A_TEST/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'"/>
-    <Exec Command="cd $(TargetDir) &#xD;&#xA;&#xD;&#xA; echo COUNT &#xD;&#xA;&#xD;&#xA; cat ./wwwroot/_framework/blazor.webassembly.js | grep 'THIS_IS_A_TEST' -c &#xD;&#xA;&#xD;&#xA;echo END COUNT" Condition="'$(OS)' != 'Windows_NT'"/>
+    <Exec Command="apt install brotli" Condition="'$(OS)' != 'Windows_NT'"/>
     
     <Exec Command="echo POST BUILD COMMANDS COMPLETED" />
   </Target>
