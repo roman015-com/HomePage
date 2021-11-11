@@ -36,7 +36,7 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">	  
 	  <Exec Command="echo BUILD OS : WINDOWS" Condition="'$(OS)' == 'Windows_NT'" />
 
-      <Exec Command="echo Modifying \wwwroot\_framework\blazor.webassembly.js" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="echo Modifying \wwwroot\_framework\blazor.webassembly.js" Condition="'$(OS)' == 'Windows_NT'" />
 	  <Exec Command="cd $(TargetDir) &#xD;&#xA;&#xD;&#xA;powershell -Command &quot;$txt=(Get-Content .\wwwroot\_framework\blazor.webassembly.js);$txt = $txt.Replace('this.loadResource(r,t(r),e[r],n)','{var p = this.loadResource(r, t(r), e[r], n); p.response.then((x) =&gt; { if (typeof window.loadResourceCallback === ''function'') { window.loadResourceCallback(Object.keys(e).length, r, x);}}); return p;}'); Set-Content -Path .\wwwroot\_framework\blazor.webassembly.js -Value $txt&quot;" Condition="'$(OS)' == 'Windows_NT' " />
 
 	  <Exec Command="echo Deleting Previous Compressed versions of blazor.webassembly.js" Condition="'$(OS)' == 'Windows_NT'" />
