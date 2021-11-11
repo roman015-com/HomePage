@@ -47,7 +47,7 @@
     <Exec Command="echo BUILD OS : LINUX" Condition="'$(OS)' != 'Windows_NT'" />
 
     <Exec Command="echo Modifying \wwwroot\_framework\blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
-    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/this\.loadResource(r,t(r),e\[r\],n)/{var p = this\.loadResource(r, t(r), e[r], n); p\.response\.then((x) =&gt; { if (typeof window\.loadResourceCallback === &quot;function&quot;) { window\.loadResourceCallback(Object\.keys(e)\.length,o,x);}}); return p;}/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="cd $(PublishDir) &#xD;&#xA;&#xD;&#xA; sed -i 's/this\.loadResource(r,t(r),e\[r\],n)/{var p = this\.loadResource(r, t(r), e[r], n); p\.response\.then((x) =&gt; { if (typeof window\.loadResourceCallback === &quot;function&quot;) { window\.loadResourceCallback(Object\.keys(e)\.length,r,x);}}); return p;}/g' ./wwwroot/_framework/blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
 
     <Exec Command="echo Deleting Previous Compressed versions of blazor.webassembly.js" Condition="'$(OS)' != 'Windows_NT'" />
     <Exec Command="cd $(PublishDir)/wwwroot/_framework/ &#xD;&#xA;&#xD;&#xA; rm blazor.webassembly.js.gz" Condition="'$(OS)' != 'Windows_NT'" />
