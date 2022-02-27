@@ -26,6 +26,8 @@
 {
     <div class="container">      
         <div class="row justify-content-center">
+            <button class="btn btn-primary" title="Copy Current Game's Url To Clipboard" @onclick="(() => CopyUrlToClipboard())">🔗 Copy</button>
+            &nbsp;
             <ShareEnabler Url="https://www.roman015.com/Wordle" Title="Try out Evil Wordle" Body="@FinalResult.TextToShare"/>
             &nbsp;
             <button class="btn btn-success" title="Reset Game" @onclick="(() => ResetGame())">↻ Reset</button>
@@ -132,7 +134,7 @@
 
     private string EvilWordleJSUrl = "./js/EvilWordle.js";
     IJSObjectReference jsEvilWordleModule;
-    (string Title, string Message, string[] Statistics, string TextToShare) FinalResult;
+    (string Title, string Message, string[] Statistics, string TextToShare, string GameUrl) FinalResult;
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -433,12 +435,14 @@
 
             FinalResult.Statistics[i] += temp;
             FinalResult.TextToShare += string.IsNullOrWhiteSpace(temp) ? string.Empty : (Environment.NewLine + temp);
-        } 
+        }
 
-        FinalResult.TextToShare += Environment.NewLine 
-            + Environment.NewLine 
-            + "Try the same puzzle here : https://www.roman015.com/Wordle?key="
-            + GetHashFromSolution();
+        FinalResult.GameUrl = "https://www.roman015.com/Wordle?key=" + GetHashFromSolution();
+        FinalResult.TextToShare += Environment.NewLine
+            + Environment.NewLine
+            + "Try the same puzzle here : " + FinalResult.GameUrl;
+
+
     }
 
     void TriggerPopup()
@@ -603,10 +607,15 @@
     {
         jsEvilWordleModule = jsEvilWordleModule ?? (await JSRuntime.InvokeAsync<IJSObjectReference>("import", EvilWordleJSUrl));
         bool IsMobile = await jsEvilWordleModule.InvokeAsync<bool>("IsDevice");
-        
+
         if(!IsMobile)
         {
             InvisibleInput.FocusAsync();
         }
+    }
+
+    void CopyUrlToClipboard()
+    {
+        jsEvilWordleModule.InvokeVoidAsync("CopyToClipboard", FinalResult.GameUrl);
     }
 }

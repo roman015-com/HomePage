@@ -7,3 +7,12 @@ export function IsDevice() {
     return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(navigator.userAgent);
 }
 
+export function CopyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function () {
+        
+    })
+    .catch(function (error) {
+        alert("Unable to copy link to clipboard");
+    });
+}
+
