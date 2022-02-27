@@ -26,11 +26,16 @@
 {
     <div class="container">      
         <div class="row justify-content-center">
-            <button class="btn btn-primary" title="Copy Current Game's Url To Clipboard" @onclick="(() => CopyUrlToClipboard())">🔗 Copy</button>
+            <button class="btn btn-primary" title="Copy Current Game's Url To Clipboard" @onclick="(() => CopyUrlToClipboard())">
+                <span class="d-none d-md-block">🔗 Copy</span>
+                <span class="d-block d-md-none">🔗</span>                                
+            </button>
             &nbsp;
             <ShareEnabler Url="https://www.roman015.com/Wordle" Title="Try out Evil Wordle" Body="@FinalResult.TextToShare"/>
             &nbsp;
-            <button class="btn btn-success" title="Reset Game" @onclick="(() => ResetGame())">↻ Reset</button>
+            <button class="btn btn-success" title="Start again with a new puzzle" @onclick="(() => ResetGame())">
+                <strong>↻</strong> Restart
+            </button>
         </div>        
     </div>   
 }
