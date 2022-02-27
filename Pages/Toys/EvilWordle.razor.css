@@ -1,0 +1,99 @@
+﻿.cell {
+    border: 2px solid #dee1e9;
+}
+
+.Blank {
+    
+}
+
+.Selected {
+
+}
+
+.Correct, .Character-Correct {
+    background-color: #79b851 !important;
+}
+
+.Absent {
+    background-color: #a4aec4 !important;
+}
+
+.Elsewhere, .Character-Elsewhere {
+    background-color: #f3c237 !important;
+}
+
+
+.Game-display {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.Game-display-row {
+    display: flex;
+    justify-content: center;
+}
+
+.Game-display-char {
+    text-align: center;
+    align-items: center;
+    border: 2px solid #dee1e9;
+    font-size: 28px;
+    font-weight: 700;
+    padding: 3px;
+    margin: 3px;
+    text-transform: uppercase;
+    width: 64px;
+    min-height: 48px;
+    border-radius: 5px;
+    color: #393e4c;
+    background: #fbfcff;
+}
+
+.Game-keyboard {
+    display: flex;
+    flex-direction: column;
+}
+
+.Game-keyboard-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+}
+
+.Game-keyboard-button:hover {
+    background-color: rgba(0,0,0,0.3);
+}
+
+.Game-keyboard-button {
+    align-items: center;
+    background-color: #dce1ed;
+    color: #5a6376 !important;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    color: inherit;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    flex: 1 1;
+    font-size: 17px;
+    font-weight: 700;
+    justify-content: center;
+    margin: 3px;
+    min-height: 40px;
+    padding: 3px;
+    text-decoration: inherit;
+    text-transform: capitalize;
+    transition: .2s;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.3);
+    -webkit-touch-callout: none;
+}
+
+.btn {
+    margin: 0.5em;
+    
+    height: 40px;
+    margin-bottom: 10px;
+}

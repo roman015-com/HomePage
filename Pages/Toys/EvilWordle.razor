@@ -1,0 +1,579 @@
+﻿@page "/Wordle"
+
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+
+
+<h1>Wordle</h1>
+
+<div class="container">
+    <div class="Game-display">
+    @for(int i = gameState.GetLowerBound(0); i <= gameState.GetUpperBound(0); i++)
+    {
+        <div class="Game-display-row">
+            @for(int j = gameState.GetLowerBound(1); j <= gameState.GetUpperBound(1); j++)
+            {
+                <div class="Game-display-char @(((GameState)gameState[i,j]).ToString())">
+                    @(guesses[i,j])
+                </div>
+            }
+        </div>
+    }
+    </div>
+</div>
+
+@if(IsGameDisabled && problems != null)
+{
+    <div class="container">      
+        <div class="row justify-content-center">
+            <ShareEnabler Url="https://www.roman015.com/Wordle" Title="Try out Evil Wordle" Body="@FinalResult.TextToShare"/>
+            &nbsp;
+            <button class="btn btn-success" title="Reset Game" @onclick="(() => ResetGame())">↻ Reset</button>
+        </div>        
+    </div>   
+}
+
+<input type="text" style="height:0px; width:0px; position: fixed; top: -10px; left: -10px;" @onkeydown="@OnKeyDown" tabindex="0" @ref="InvisibleInput" />
+<div class="container">    
+    <div class="Game-keyboard">
+        @for(int i = 0; i < letters.Count; i++)
+        {
+            <div class="Game-keyboard-row">
+                @for(int j = 0; j < letters[i].Length; j++)
+                {
+                    // Don't use i and j directly
+                    var a = i;
+                    var b = j;
+                    <button tabindex="-1" class="Game-keyboard-button @GetCharacterStatus(letters[a][b])" @onclick="(() => InsertCharacter(a, b))" disabled="@IsGameDisabled">@letters[a][b]</button>
+                }
+            </div>
+        }        
+    </div>
+</div>
+
+<div class="modal fade" id="EvilWordleModal" tabindex="-1" role="dialog" aria-labelledby="EvilWordleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EvilWordleModalLabel">@FinalResult.Title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            @FinalResult.Message
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        @for(int i = 0; FinalResult.Statistics != null && i < FinalResult.Statistics.Length ; i++)
+                        {
+                            @if(!string.IsNullOrWhiteSpace(FinalResult.Statistics[i]))
+                            {
+                                <div class="col-12">
+                                    @FinalResult.Statistics[i]
+                                </div>    
+                            }                            
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    int[,] gameState = new int[6, 5];
+    char[,] guesses = new char[6, 5];
+    char[] solution = new char[5];
+
+    enum GameState { UnSelected, Absent, Elsewhere, Correct};
+
+    int currGuess = 0;
+
+    string[] words;
+    string[] problems;
+
+    bool IsGameDisabled = true;
+
+    List<char[]> letters = new List<char[]>()
+    {
+        "QWERTYUIOP".ToCharArray(),
+        "ASDFGHJKL".ToCharArray(),
+        "←ZXCVBNM↲".ToCharArray()
+    };
+    Dictionary<char,int> letterState = new Dictionary<char, int>();
+
+    private string EvilWordleJSUrl = "./js/EvilWordle.js";
+    IJSObjectReference jsEvilWordleModule;
+    (string Title, string Message, string[] Statistics, string TextToShare) FinalResult;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Key { get; set; }
+
+    ElementReference InvisibleInput;
+
+    protected async override void OnInitialized()
+    {
+        jsEvilWordleModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", EvilWordleJSUrl);
+
+        words = await Http.GetFromJsonAsync<string[]>("words.json");
+        problems = await Http.GetFromJsonAsync<string[]>("problems.json");
+
+        ResetGame(Key);
+
+        StateHasChanged();
+    }
+
+    void SelectRandomWord(string hash = "")
+    {
+        if(string.IsNullOrWhiteSpace(hash))
+        {
+            solution = problems[new Random().Next(problems.Length)].ToCharArray();    
+        }
+        else
+        {
+            /*
+            * Hash Format
+            * "ABCDI45"
+            * "ABCYZ", 45
+            * "1, 2, 3, 25, 26", 45
+            * idx = (((1 * 2 * 3 * 25 * 26) - 1) %  problems.Length) + 45
+            * idx = idx %  problems.Length
+             */
+
+            try
+            {
+                int idx = GetIdxFromHash(hash);
+                solution = problems[idx].ToCharArray();    
+            }
+            catch
+            {
+                Console.Write("Invalid Hash : " + hash + ", using random word instead");
+                solution = problems[new Random().Next(problems.Length)].ToCharArray();    
+            }            
+        }
+
+        Console.WriteLine(solution);
+    }
+
+    int GetIdxFromHash(string hash)
+    {
+        string hashWord = hash.Substring(0, 5).ToUpper();
+        int hashNumber = Convert.ToInt32(hash.Substring(5));
+
+        int[] hashNumbers = hashWord.ToCharArray()
+            .Select(ch => (int)(ch - 'A') + 1)
+            .ToArray();
+
+        int idx = 1;
+        foreach (int i in hashNumbers) idx *= i;
+        --idx;
+        idx = idx % problems.Length + hashNumber;
+        idx = idx % problems.Length;
+
+        return idx;
+    }
+
+    string GetHashFromSolution()
+    {
+        string solutionString = string.Join(string.Empty, solution);
+        int solutionIdx = Array.FindIndex(problems, item => item == solutionString);
+
+        int randomIdx = new Random().Next(problems.Length);
+        int idx = GetIdxFromHash(problems[randomIdx] + "0");
+
+        string hash = string.Empty;
+        if(idx < solutionIdx)
+        {            
+            hash = problems[randomIdx] + (solutionIdx - idx).ToString();    
+        }
+        else
+        {         
+            hash = problems[randomIdx] + (solutionIdx - idx + problems.Length).ToString();
+        }
+
+        //Console.WriteLine(solutionString + "=" + hash);
+        return hash;
+    }
+
+    void ResetGame(string hash = "")
+    {
+        IsGameDisabled = true;
+
+        for(int i = gameState.GetLowerBound(0); i <= gameState.GetUpperBound(0); i++)
+        {
+            for(int j = gameState.GetLowerBound(1); j <= gameState.GetUpperBound(1); j++)
+            {
+                gameState[i, j] = (int)GameState.UnSelected;
+                guesses[i, j] = ' ';
+            }
+        }
+
+        letterState.Clear();
+        for(int i = 0; i < 26; i++)
+        {
+            letterState.Add((char)('A' + i), (int)GameState.UnSelected);
+        }
+
+        currGuess = 0;
+        SelectRandomWord(hash);
+
+        IsGameDisabled = false;
+    }
+
+    void InsertCharacter(int a, int b)
+    {   
+        char ch = letters[a][b];
+
+        if(ch == '←')
+        {
+            RemoveCharacter();
+        }
+        else if(ch == '↲')
+        {
+            TriggerGuess();
+        }
+        else
+        {
+            InsertCharacter(ch);   
+        }    
+        
+        InvisibleInput.FocusAsync();
+    }
+
+    void InsertCharacter(char ch)
+    {
+        for(int i = guesses.GetLowerBound(1); i <= guesses.GetUpperBound(1); i++)
+        {
+            if(!char.IsLetter(guesses[currGuess,i]))
+            {
+                guesses[currGuess, i] = ch;
+                break;
+            }
+        }
+    }
+
+    void RemoveCharacter()
+    {
+        for(int i = guesses.GetUpperBound(1); i >= guesses.GetLowerBound(1); i--)
+        {
+            if(char.IsLetter(guesses[currGuess,i]))
+            {
+                guesses[currGuess, i] = ' ';
+                break;
+            }
+        }
+    }
+
+    string GetCharacterStatus(char ch)
+    {
+        return "Character" + (letterState.ContainsKey(ch) ? "-" + ((GameState)letterState[ch]).ToString() : GameState.UnSelected.ToString());
+    }
+
+    bool IsInputComplete()
+    {
+        for(int i = guesses.GetLowerBound(1); i <= guesses.GetUpperBound(1); i++)
+        {
+            if(!char.IsLetter(guesses[currGuess,i]))
+            {
+                // TODO : Show Too Few Characters Error
+                Console.WriteLine("IsInputComplete : false");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool IsInputValidWord()
+    {
+        string currentGuess = "";
+        for(int i = guesses.GetLowerBound(1); i <= guesses.GetUpperBound(1); i++)
+        {
+            if(!char.IsLetter(guesses[currGuess, i]))
+            {
+                break;
+            }
+
+            currentGuess += guesses[currGuess, i].ToString();
+        }
+
+        Console.WriteLine("IsInputValid : " + currentGuess + " : " + words.Contains(currentGuess));
+
+        return words.Contains(currentGuess);
+    }
+
+    void TriggerGuess()
+    {
+        if(!IsInputComplete())
+        {
+            // TODO : Show Too Few Characters Error
+            return;
+        }
+
+        if(!IsInputValidWord())
+        {
+            // TODO : Show Invalid Word Error
+            return;
+        }
+
+        CompareWithSolution();
+
+        if(IsGameWon())
+        {
+            // Display Game Won
+            Console.WriteLine("Congrats, you win!");
+
+            TriggerWin();
+
+            IsGameDisabled = true;
+        }
+        else if(IsGameOver())
+        {
+            // Display Game Lost
+            Console.WriteLine("You lost! The word was : " + string.Join("",solution));
+
+            TriggerLoss();
+
+            IsGameDisabled = true;
+        }
+
+        currGuess++;
+    }
+
+    void TriggerWin()
+    {
+        FinalResult.Title = "You Win! 🏆";
+        FinalResult.Message = "Congrats, you guessed it in " + (currGuess + 1) + " attempts!";
+
+        if(currGuess == 0)
+        {
+            FinalResult.Message = "Wow, you guessed '" + string.Join("", solution) + "' it in the first try! 🎖";    
+        }
+
+        if(currGuess == 1)
+        {
+            FinalResult.Message = "You figured out it was '" + string.Join("", solution) + "' in just two guesses - Awesome! 🆒💥🔥";    
+        }
+
+        GenerateStatisticsAndTextToShare();
+
+        TriggerPopup();
+    }
+
+    void TriggerLoss()
+    {
+        FinalResult.Title = "You Lost!";
+        FinalResult.Message = "Better Luck Next Time! The word was '" + string.Join("", solution) + "'";        
+
+        GenerateStatisticsAndTextToShare();
+
+        TriggerPopup();
+    }
+
+    void GenerateStatisticsAndTextToShare()
+    {
+        FinalResult.TextToShare = "I just played Evil Wordle! Here's my score : " + Environment.NewLine;              
+
+        FinalResult.Statistics = new string[guesses.GetLength(0)];
+        for(int i = gameState.GetLowerBound(0); i <= gameState.GetUpperBound(0); i++)
+        {
+            string temp = "";
+
+            for(int j = gameState.GetLowerBound(1); j <= gameState.GetUpperBound(1); j++)
+            {
+                switch((GameState)(gameState[i,j]))
+                {
+                    case GameState.Correct:
+                        temp = temp + "✅";
+                        break;
+
+                    case GameState.Elsewhere:
+                        temp = temp + "🟨";
+                        break;
+
+                    case GameState.Absent:
+                        temp = temp + "⬛";
+                        break;
+                }
+            }
+
+            FinalResult.Statistics[i] += temp;
+            FinalResult.TextToShare += string.IsNullOrWhiteSpace(temp) ? string.Empty : (Environment.NewLine + temp);
+        } 
+
+        FinalResult.TextToShare += Environment.NewLine 
+            + Environment.NewLine 
+            + "Try the same puzzle here : https://www.roman015.com/Wordle?key="
+            + GetHashFromSolution();
+    }
+
+    void TriggerPopup()
+    {
+        StateHasChanged();
+
+        jsEvilWordleModule.InvokeVoidAsync("TriggerModal");
+    }
+
+    bool IsGameOver()
+    {
+        return currGuess >= gameState.GetUpperBound(0);
+    }
+
+    bool IsGameWon()
+    {
+        for(int i = gameState.GetLowerBound(1); i <= gameState.GetUpperBound(1); i++)
+        {
+            if(gameState[currGuess, i] != (int)GameState.Correct)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void CompareWithSolution()
+    {
+        List<(char ch, int pos)> SortedGuess = new List<(char, int)>();
+        List<(char ch, int pos)> SortedSolution = new List<(char, int)>();
+        List<int> ResultStates = new List<int>();
+
+        #region Get & Sort Inputs
+        for(int i = guesses.GetLowerBound(1); i <= guesses.GetUpperBound(1); i++)
+        {
+            SortedGuess.Add((char.ToUpper(guesses[currGuess, i]), i));
+            SortedSolution.Add((char.ToUpper(solution[i]), i));
+            ResultStates.Add((int)GameState.UnSelected);
+        }        
+        SortedGuess.Sort();
+        SortedSolution.Sort();        
+        #endregion
+
+        #region Correct
+        int guessIdx = 0, solutionIdx = 0;
+        while(guessIdx < SortedGuess.Count && solutionIdx < SortedSolution.Count)
+        {
+            if(SortedGuess[guessIdx].ch == SortedSolution[solutionIdx].ch)
+            {
+                if(SortedGuess[guessIdx].pos == SortedSolution[solutionIdx].pos)
+                {                    
+                    ResultStates[SortedGuess[guessIdx].pos] = (int)GameState.Correct;
+                    letterState[SortedGuess[guessIdx].ch] = (int)GameState.Correct;
+
+                    SortedGuess.RemoveAt(guessIdx);
+                    SortedSolution.RemoveAt(solutionIdx);
+                }
+                else
+                {                                         
+                    if(SortedGuess[guessIdx].pos < SortedSolution[solutionIdx].pos)
+                    {                        
+                        guessIdx++;
+                    }
+                    else
+                    {
+                        solutionIdx++;
+                    }
+                }
+            }
+            else if(SortedGuess[guessIdx].ch < SortedSolution[solutionIdx].ch)
+            {   
+                guessIdx++;
+            }
+            else
+            {
+                solutionIdx++;
+            }
+        }
+        #endregion
+
+        #region Elsewhere
+        guessIdx = 0;
+        solutionIdx = 0; 
+        while(guessIdx < SortedGuess.Count && solutionIdx < SortedSolution.Count)
+        {
+            if(SortedGuess[guessIdx].ch == SortedSolution[solutionIdx].ch)
+            {
+                ResultStates[SortedGuess[guessIdx].pos] = (int)GameState.Elsewhere;
+                letterState[SortedGuess[guessIdx].ch] = (letterState[SortedGuess[guessIdx].ch] <= (int)GameState.Elsewhere)
+                ? (int)GameState.Elsewhere 
+                : letterState[SortedGuess[guessIdx].ch];
+
+                SortedGuess.RemoveAt(guessIdx);
+                SortedSolution.RemoveAt(solutionIdx);
+            }
+            else if(SortedGuess[guessIdx].ch < SortedSolution[solutionIdx].ch)
+            {   
+                guessIdx++;
+            }
+            else
+            {
+                solutionIdx++;
+            }   
+        }
+        #endregion
+
+        #region Absent For Everything Else
+        for(int i = 0; i < ResultStates.Count; i++)
+        {
+            ResultStates[i] = (ResultStates[i] <= (int)GameState.Absent)
+                    ? (int)GameState.Absent
+                    : ResultStates[i];
+
+            if(ResultStates[i] == (int)GameState.Absent)
+            {
+                letterState[guesses[currGuess,i]] = (letterState[guesses[currGuess,i]] <= (int)GameState.Absent)
+                ? (int)GameState.Absent 
+                : letterState[guesses[currGuess,i]];    
+            }            
+        }
+        #endregion
+
+        // Store Comparison Result into array for display
+        for(int i = gameState.GetLowerBound(1); i <= gameState.GetUpperBound(1); i++)
+        {            
+            gameState[currGuess, i] = ResultStates[i];
+        }
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) 
+        {
+            await InvisibleInput.FocusAsync();
+        }            
+    }  
+
+    void OnKeyDown(KeyboardEventArgs e)
+    {
+        if(e.Key == "Enter")
+        {
+            //Console.WriteLine("ENTER PRESSED");
+            TriggerGuess();
+        }
+        else if(e.Key == "Backspace")
+        {
+            //Console.WriteLine("Backspace PRESSED");
+            RemoveCharacter();
+        }
+        else if(e.Key.Length == 1 && char.IsLetter(e.Key.ToCharArray()[0]))
+        {
+            //Console.WriteLine(e.Key.ToUpper().ToCharArray()[0]);    
+
+            InsertCharacter(e.Key.ToUpper().ToCharArray()[0]);
+        }
+
+        InvisibleInput.FocusAsync();
+    }
+}
