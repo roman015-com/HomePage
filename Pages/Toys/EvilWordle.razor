@@ -44,7 +44,25 @@
                     // Don't use i and j directly
                     var a = i;
                     var b = j;
-                    <button tabindex="-1" class="Game-keyboard-button @GetCharacterStatus(letters[a][b])" @onclick="(() => InsertCharacter(a, b))" disabled="@IsGameDisabled">@letters[a][b]</button>
+                    <button tabindex="-1" class="Game-keyboard-button 
+                            @GetCharacterStatus(letters[a][b])" 
+                            @onclick="(() => InsertCharacter(a, b))" 
+                            disabled="@IsGameDisabled">
+                            @if(letters[a][b] == '↲')
+                            {
+                                <span class="d-none d-md-block">Enter</span>
+                                <span class="d-block d-md-none">↲</span>
+                            }
+                            else if(letters[a][b] == '←')
+                            {
+                                <span class="d-none d-md-block">Delete</span>
+                                <span class="d-block d-md-none">←</span>
+                            }
+                            else
+                            {
+                                @letters[a][b]
+                            }                            
+                    </button>
                 }
             </div>
         }        
