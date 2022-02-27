@@ -159,12 +159,12 @@
             }
             catch
             {
-                Console.Write("Invalid Hash : " + hash + ", using random word instead");
+                Console.WriteLine("Invalid Hash : " + hash + ", using random word instead");
                 solution = problems[new Random().Next(problems.Length)].ToCharArray();    
             }            
         }
 
-        Console.WriteLine(solution);
+        //Console.WriteLine(solution);
     }
 
     int GetIdxFromHash(string hash)
@@ -248,8 +248,8 @@
         {
             InsertCharacter(ch);   
         }    
-        
-        InvisibleInput.FocusAsync();
+
+        FocusForKeyboardIfDesktop();
     }
 
     void InsertCharacter(char ch)
@@ -289,6 +289,7 @@
             {
                 // TODO : Show Too Few Characters Error
                 Console.WriteLine("IsInputComplete : false");
+
                 return false;
             }
         }
@@ -551,7 +552,7 @@
     {
         if (firstRender) 
         {
-            await InvisibleInput.FocusAsync();
+            FocusForKeyboardIfDesktop();
         }            
     }  
 
@@ -574,6 +575,17 @@
             InsertCharacter(e.Key.ToUpper().ToCharArray()[0]);
         }
 
-        InvisibleInput.FocusAsync();
+        FocusForKeyboardIfDesktop();
+    }
+
+    async void FocusForKeyboardIfDesktop()
+    {
+        jsEvilWordleModule = jsEvilWordleModule ?? (await JSRuntime.InvokeAsync<IJSObjectReference>("import", EvilWordleJSUrl));
+        bool IsMobile = await jsEvilWordleModule.InvokeAsync<bool>("IsDevice");
+        
+        if(!IsMobile)
+        {
+            InvisibleInput.FocusAsync();
+        }
     }
 }

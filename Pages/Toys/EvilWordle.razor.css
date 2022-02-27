@@ -14,7 +14,7 @@
     background-color: #79b851 !important;
 }
 
-.Absent {
+.Absent, .Character-Absent {
     background-color: #a4aec4 !important;
 }
 
