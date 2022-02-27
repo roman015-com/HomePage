@@ -247,6 +247,8 @@
         SelectRandomWord(hash);
 
         IsGameDisabled = false;
+
+        FocusForKeyboardIfDesktop();
     }
 
     void InsertCharacter(int a, int b)
@@ -304,9 +306,7 @@
         {
             if(!char.IsLetter(guesses[currGuess,i]))
             {
-                // TODO : Show Too Few Characters Error
-                Console.WriteLine("IsInputComplete : false");
-                toastService.ShowWarning("Too Few Characters!", "Incomplete Guess");
+                Console.WriteLine("IsInputComplete : false");                
                 return false;
             }
         }
@@ -328,28 +328,25 @@
         }
 
         Console.WriteLine("IsInputValid : " + currentGuess + " : " + words.Contains(currentGuess));
-        if(!words.Contains(currentGuess))
-        {
-            toastService.ShowError("'"+ currentGuess + "' Not a valid word", "Invalid Guess");
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return words.Contains(currentGuess);
     }
 
     void TriggerGuess()
     {
         if(!IsInputComplete())
         {
-            // TODO : Show Too Few Characters Error
+            toastService.ShowWarning("Too Few Characters!", "Incomplete Guess", () => { FocusForKeyboardIfDesktop(); });
             return;
         }
 
         if(!IsInputValidWord())
         {
-            // TODO : Show Invalid Word Error
+            toastService.ShowError("'" 
+                + string.Join(string.Empty, 
+                        Enumerable.Range(0, guesses.GetLength(1))
+                            .Select(x => guesses[currGuess, x])
+                            .ToArray()) 
+                + "' Not a valid word", "Invalid Guess", () => { FocusForKeyboardIfDesktop(); });
             return;
         }
 
