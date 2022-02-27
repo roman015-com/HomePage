@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Blazored.Toast;
 using HomePage.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -28,6 +29,7 @@ namespace HomePage
 
             Roman015APIClientSetup(builder);
             BlazoredLocalStorageSetup(builder);
+            BlazoredToastSetup(builder);
 
             await builder.Build().RunAsync();
         }
@@ -68,6 +70,11 @@ namespace HomePage
         public static void BlazoredLocalStorageSetup(WebAssemblyHostBuilder builder)
         {
             builder.Services.AddBlazoredLocalStorage();
+        }
+
+        public static void BlazoredToastSetup(WebAssemblyHostBuilder builder)
+        {
+            builder.Services.AddBlazoredToast();
         }
     }
 }

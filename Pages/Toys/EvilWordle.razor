@@ -2,8 +2,7 @@
 
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
-
-
+@inject IToastService toastService
 
 <h1>Wordle</h1>
 
@@ -289,7 +288,7 @@
             {
                 // TODO : Show Too Few Characters Error
                 Console.WriteLine("IsInputComplete : false");
-
+                toastService.ShowWarning("Too Few Characters!", "Incomplete Guess");
                 return false;
             }
         }
@@ -311,8 +310,15 @@
         }
 
         Console.WriteLine("IsInputValid : " + currentGuess + " : " + words.Contains(currentGuess));
-
-        return words.Contains(currentGuess);
+        if(!words.Contains(currentGuess))
+        {
+            toastService.ShowError("'"+ currentGuess + "' Not a valid word", "Invalid Guess");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     void TriggerGuess()
