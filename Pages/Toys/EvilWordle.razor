@@ -87,26 +87,35 @@
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            @FinalResult.Message
-                        </div>
+                    <div class="row justify-content-center">
+                        @FinalResult.Message
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            &nbsp;
-                        </div>
+                    
+                    <div class="row justify-content-center">
+                        &nbsp;
                     </div>
-                    <div class="row">
-                        @for(int i = 0; FinalResult.Statistics != null && i < FinalResult.Statistics.Length ; i++)
+                    
+                    @for(int i = 0; FinalResult.Statistics != null && i < FinalResult.Statistics.Length ; i++)
+                    {
+                        @if(!string.IsNullOrWhiteSpace(FinalResult.Statistics[i]))
                         {
-                            @if(!string.IsNullOrWhiteSpace(FinalResult.Statistics[i]))
-                            {
-                                <div class="col-12">
-                                    @FinalResult.Statistics[i]
-                                </div>    
-                            }                            
-                        }
+                            <div class="row justify-content-center">
+                                @FinalResult.Statistics[i]
+                            </div>
+                        }                            
+                    }
+
+                    <div class="row justify-content-center">
+                        &nbsp;
+                    </div>
+                    
+                    <div class="row justify-content-center">
+                        <a class="btn btn-primary" href="https://www.bing.com/search?q=@(FinalResult.Solution)+definition" target="_blank">
+                            @FinalResult.Solution Meaning
+                            &nbsp;<span class="oi oi-external-link tiny-icon" aria-hidden="true" />
+                        </a>
+                        &nbsp;
+                        <button class="btn btn-secondary" onclick="$('#EvilWordleModal').modal('hide')" >Okay</button>
                     </div>
                 </div>
             </div>
@@ -139,7 +148,7 @@
 
     private string EvilWordleJSUrl = "./js/EvilWordle.js";
     IJSObjectReference jsEvilWordleModule;
-    (string Title, string Message, string[] Statistics, string TextToShare, string GameUrl) FinalResult;
+    (string Title, string Message, string[] Statistics, string TextToShare, string GameUrl, string Solution) FinalResult;
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -383,17 +392,18 @@
 
     void TriggerWin()
     {
+        FinalResult.Solution = string.Join("", solution);
         FinalResult.Title = "You Win! 🏆";
-        FinalResult.Message = "Congrats, you guessed it in " + (currGuess + 1) + " attempts!";
+        FinalResult.Message = "Congrats, you guessed '" + FinalResult.Solution + "' in " + (currGuess + 1) + " attempts!";
 
         if(currGuess == 0)
         {
-            FinalResult.Message = "Wow, you guessed '" + string.Join("", solution) + "' it in the first try! 🎖";    
+            FinalResult.Message = "Wow, you guessed '" + FinalResult.Solution + "' it in the first try! 🎖";    
         }
 
         if(currGuess == 1)
         {
-            FinalResult.Message = "You figured out it was '" + string.Join("", solution) + "' in just two guesses - Awesome! 🆒💥🔥";    
+            FinalResult.Message = "You figured out it was '" + FinalResult.Solution + "' in just two guesses - Awesome! 🆒💥🔥";    
         }
 
         GenerateStatisticsAndTextToShare();
@@ -403,8 +413,9 @@
 
     void TriggerLoss()
     {
+        FinalResult.Solution = string.Join("", solution);
         FinalResult.Title = "You Lost!";
-        FinalResult.Message = "Better Luck Next Time! The word was '" + string.Join("", solution) + "'";        
+        FinalResult.Message = "Better Luck Next Time! The word was '" + FinalResult.Solution + "'";        
 
         GenerateStatisticsAndTextToShare();
 
