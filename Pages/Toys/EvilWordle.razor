@@ -41,39 +41,37 @@
 }
 
 <input type="text" style="height:0px; width:0px; position: fixed; top: -10px; left: -10px;" @onkeydown="@OnKeyDown" tabindex="0" @ref="InvisibleInput" />
-<div class="container">    
-    <div class="Game-keyboard">
-        @for(int i = 0; i < letters.Count; i++)
+<div class="Game-keyboard">
+@for(int i = 0; i < letters.Count; i++)
+{
+    <div class="Game-keyboard-row">
+        @for(int j = 0; j < letters[i].Length; j++)
         {
-            <div class="Game-keyboard-row">
-                @for(int j = 0; j < letters[i].Length; j++)
-                {
-                    // Don't use i and j directly
-                    var a = i;
-                    var b = j;
-                    <button tabindex="-1" class="Game-keyboard-button 
-                            @GetCharacterStatus(letters[a][b])" 
-                            @onclick="(() => InsertCharacter(a, b))" 
-                            disabled="@IsGameDisabled">
-                            @if(letters[a][b] == '↲')
-                            {
-                                <span class="d-none d-md-block">Enter</span>
-                                <span class="d-block d-md-none">↲</span>
-                            }
-                            else if(letters[a][b] == '←')
-                            {
-                                <span class="d-none d-md-block">Delete</span>
-                                <span class="d-block d-md-none">←</span>
-                            }
-                            else
-                            {
-                                @letters[a][b]
-                            }                            
-                    </button>
-                }
-            </div>
-        }        
+            // Don't use i and j directly
+            var a = i;
+            var b = j;
+            <button tabindex="-1" class="Game-keyboard-button 
+                    @GetCharacterStatus(letters[a][b])" 
+                    @onclick="(() => InsertCharacter(a, b))" 
+                    disabled="@IsGameDisabled">
+                    @if(letters[a][b] == '↲')
+                    {
+                        <span class="d-none d-md-block">Enter</span>
+                        <span class="d-block d-md-none">↲</span>
+                    }
+                    else if(letters[a][b] == '←')
+                    {
+                        <span class="d-none d-md-block">Delete</span>
+                        <span class="d-block d-md-none">←</span>
+                    }
+                    else
+                    {
+                        @letters[a][b]
+                    }                            
+            </button>
+        }
     </div>
+}        
 </div>
 
 <div class="modal fade" id="EvilWordleModal" tabindex="-1" role="dialog" aria-labelledby="EvilWordleModalLabel" aria-hidden="true">
