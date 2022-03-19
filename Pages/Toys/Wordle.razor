@@ -31,7 +31,7 @@
                 <span class="d-block d-md-none">🔗</span>                                
             </button>
             &nbsp;
-            <ShareEnabler Url="https://www.roman015.com/Wordle" Title="Try out Evil Wordle" Body="@FinalResult.TextToShare"/>
+            <ShareEnabler Url="https://www.roman015.com/Wordle" Title="Try out Wordle" Body="@FinalResult.TextToShare"/>
             &nbsp;
             <button class="btn btn-success" title="Start again with a new puzzle" @onclick="(() => ResetGame())">
                 <strong>↻</strong> Restart
@@ -74,11 +74,11 @@
 }        
 </div>
 
-<div class="modal fade" id="EvilWordleModal" tabindex="-1" role="dialog" aria-labelledby="EvilWordleModalLabel" aria-hidden="true">
+<div class="modal fade" id="WordleModal" tabindex="-1" role="dialog" aria-labelledby="WordleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="EvilWordleModalLabel">@FinalResult.Title</h5>
+                <h5 class="modal-title" id="WordleModalLabel">@FinalResult.Title</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -113,7 +113,7 @@
                             &nbsp;<span class="oi oi-external-link tiny-icon" aria-hidden="true" />
                         </a>
                         &nbsp;
-                        <button class="btn btn-secondary" onclick="$('#EvilWordleModal').modal('hide')" >Okay</button>
+                        <button class="btn btn-secondary" onclick="$('#WordleModal').modal('hide')" >Okay</button>
                     </div>
                 </div>
             </div>
@@ -144,8 +144,8 @@
     };
     Dictionary<char,int> letterState = new Dictionary<char, int>();
 
-    private string EvilWordleJSUrl = "./js/EvilWordle.js";
-    IJSObjectReference jsEvilWordleModule;
+    private string WordleJSUrl = "./js/Wordle.js";
+    IJSObjectReference jsWordleModule;
     (string Title, string Message, string[] Statistics, string TextToShare, string GameUrl, string Solution) FinalResult;
 
     [Parameter]
@@ -156,7 +156,7 @@
 
     protected async override void OnInitialized()
     {
-        jsEvilWordleModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", EvilWordleJSUrl);
+        jsWordleModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", WordleJSUrl);
 
         words = await Http.GetFromJsonAsync<string[]>("words.json");
         problems = await Http.GetFromJsonAsync<string[]>("problems.json");
@@ -422,7 +422,7 @@
 
     void GenerateStatisticsAndTextToShare()
     {
-        FinalResult.TextToShare = "I just played Evil Wordle! Here's my score : " + Environment.NewLine;              
+        FinalResult.TextToShare = "I just played Wordle! Here's my score : " + Environment.NewLine;              
 
         FinalResult.Statistics = new string[guesses.GetLength(0)];
         for(int i = gameState.GetLowerBound(0); i <= gameState.GetUpperBound(0); i++)
@@ -463,7 +463,7 @@
     {
         StateHasChanged();
 
-        jsEvilWordleModule.InvokeVoidAsync("TriggerModal");
+        jsWordleModule.InvokeVoidAsync("TriggerModal");
     }
 
     bool IsGameOver()
@@ -599,8 +599,17 @@
     {
         if(e.Key == "Enter")
         {
-            //Console.WriteLine("ENTER PRESSED");
-            TriggerGuess();
+            if(!IsGameDisabled)
+            {
+                //Console.WriteLine("ENTER PRESSED");
+                TriggerGuess();    
+            }
+            else
+            {
+                // Reset the Game
+                StateHasChanged();
+                jsWordleModule.InvokeVoidAsync("HideModal");
+            }
         }
         else if(e.Key == "Backspace")
         {
@@ -619,8 +628,8 @@
 
     async void FocusForKeyboardIfDesktop()
     {
-        jsEvilWordleModule = jsEvilWordleModule ?? (await JSRuntime.InvokeAsync<IJSObjectReference>("import", EvilWordleJSUrl));
-        bool IsMobile = await jsEvilWordleModule.InvokeAsync<bool>("IsDevice");
+        jsWordleModule = jsWordleModule ?? (await JSRuntime.InvokeAsync<IJSObjectReference>("import", WordleJSUrl));
+        bool IsMobile = await jsWordleModule.InvokeAsync<bool>("IsDevice");
 
         if(!IsMobile)
         {
@@ -630,6 +639,6 @@
 
     void CopyUrlToClipboard()
     {
-        jsEvilWordleModule.InvokeVoidAsync("CopyToClipboard", FinalResult.GameUrl);
+        jsWordleModule.InvokeVoidAsync("CopyToClipboard", FinalResult.GameUrl);
     }
 }

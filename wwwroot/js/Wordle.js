@@ -1,5 +1,10 @@
-﻿export function TriggerModal() {
-    $('#EvilWordleModal').modal('show')
+﻿
+export function TriggerModal() {
+    $('#WordleModal').modal('show')
+}
+
+export function HideModal() {
+    $('#WordleModal').modal('hide')
 }
 
 export function IsDevice() {
