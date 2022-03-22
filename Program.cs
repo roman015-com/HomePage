@@ -3,6 +3,7 @@ using Blazored.Toast;
 using HomePage.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,9 @@ namespace HomePage
             builder.Services.AddScoped(sp => new HttpClient { 
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
             });
+
+
+            builder.Services.AddScoped<LazyAssemblyLoader>();
 
             Roman015APIClientSetup(builder);
             BlazoredLocalStorageSetup(builder);
