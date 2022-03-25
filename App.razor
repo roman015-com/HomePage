@@ -40,6 +40,18 @@
                     new[] { "BlazorWordle.dll" });
                 lazyLoadedAssemblies.AddRange(assemblies);
             }
+            else if (new string[] { 
+                    "DummyFile"
+                    ,"GuessTheNumber"
+                    ,"QRCode"
+                    ,"TimezoneTool"
+                    ,"MOHTimeLine"
+                }.Contains(args.Path))
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    new[] { "HomePageToys.dll" });
+                lazyLoadedAssemblies.AddRange(assemblies);
+            }
         }
         catch (Exception ex)
         {
