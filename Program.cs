@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using Blazored.Toast;
+using HomePageToys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
@@ -43,28 +44,11 @@ namespace HomePage
             });
 
             builder.Services.AddBlogEditor();
-            Roman015APIClientSetup(builder);
-            BlazoredLocalStorageSetup(builder);
-            BlazoredToastSetup(builder);
+            builder.Services.AddHomePageToys();
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddBlazoredToast();
 
             await builder.Build().RunAsync();
-        }
-
-        public static void Roman015APIClientSetup(WebAssemblyHostBuilder builder)
-        {
-            builder.Services.AddSingleton<StarWarsHub>(sp => {
-                return StarWarsHub.GetSingletonInstance();
-            });            
-        }
-
-        public static void BlazoredLocalStorageSetup(WebAssemblyHostBuilder builder)
-        {
-            builder.Services.AddBlazoredLocalStorage();
-        }
-
-        public static void BlazoredToastSetup(WebAssemblyHostBuilder builder)
-        {
-            builder.Services.AddBlazoredToast();
         }
     }
 }
