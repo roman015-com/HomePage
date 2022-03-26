@@ -1,19 +1,14 @@
 using Blazored.LocalStorage;
 using Blazored.Toast;
-using HomePageToys;
+using HomePage.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using RazorBlogEditor;
 using Roman015API.Clients;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HomePage
@@ -51,4 +46,30 @@ namespace HomePage
             await builder.Build().RunAsync();
         }
     }
+
+    public static class IServiceCollectionExtensions
+    {
+        public static void AddBlogEditor(this IServiceCollection ServiceCollection)
+        {
+            ServiceCollection.AddAuthorizationCore(config =>
+            {
+                config.AddPolicy("BlogAdministratorsOnly", policy => policy.AddRequirements(new PermittedRoleRequirement("BlogAdministrator")));
+            });
+
+            #region For FE RBAC
+            ServiceCollection.AddSingleton<IAuthorizationPolicyProvider, PermittedRolePolicyProvider>();
+            ServiceCollection.AddSingleton<IAuthorizationHandler, PermittedRoleAuthorizationHandler>();
+            #endregion
+
+            ServiceCollection.AddScoped<BlogEditorAPIClient>();
+        }
+
+        public static void AddHomePageToys(this IServiceCollection ServiceCollection)
+        {
+            ServiceCollection.AddSingleton<StarWarsHub>(sp => {
+                return StarWarsHub.GetSingletonInstance();
+            });
+        }
+    }
+
 }
