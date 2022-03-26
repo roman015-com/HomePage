@@ -1,6 +1,5 @@
 using Blazored.LocalStorage;
 using Blazored.Toast;
-using HomePage.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RazorBlogEditor;
 using Roman015API.Clients;
 using System;
 using System.Collections.Generic;
@@ -28,18 +28,8 @@ namespace HomePage
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
             });
 
-
             builder.Services.AddScoped<LazyAssemblyLoader>();
 
-            Roman015APIClientSetup(builder);
-            BlazoredLocalStorageSetup(builder);
-            BlazoredToastSetup(builder);
-
-            await builder.Build().RunAsync();
-        }
-
-        public static void Roman015APIClientSetup(WebAssemblyHostBuilder builder)
-        {
             builder.Services.AddMsalAuthentication(options =>
             {
                 builder.Configuration
@@ -51,24 +41,20 @@ namespace HomePage
                 options.ProviderOptions.LoginMode = "redirect";
 
             });
-            builder.Services.AddAuthorizationCore(config =>
-            {
-                config.AddPolicy("BlogAdministratorsOnly", policy => policy.AddRequirements(new PermittedRoleRequirement("BlogAdministrator")));
-            });
 
-            builder.Services.AddSingleton<TestSignalRHub>(sp => {
-                return TestSignalRHub.GetSingletonInstance();
-            });
+            builder.Services.AddBlogEditor();
+            Roman015APIClientSetup(builder);
+            BlazoredLocalStorageSetup(builder);
+            BlazoredToastSetup(builder);
+
+            await builder.Build().RunAsync();
+        }
+
+        public static void Roman015APIClientSetup(WebAssemblyHostBuilder builder)
+        {
             builder.Services.AddSingleton<StarWarsHub>(sp => {
                 return StarWarsHub.GetSingletonInstance();
-            });
-
-            #region For FE RBAC
-            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermittedRolePolicyProvider>();
-            builder.Services.AddSingleton<IAuthorizationHandler, PermittedRoleAuthorizationHandler>();
-            #endregion
-
-            builder.Services.AddScoped<BlogEditorAPIClient>();
+            });            
         }
 
         public static void BlazoredLocalStorageSetup(WebAssemblyHostBuilder builder)

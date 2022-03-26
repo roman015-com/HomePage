@@ -53,6 +53,12 @@
                     new[] { "HomePageToys.dll" });
                 lazyLoadedAssemblies.AddRange(assemblies);
             }
+            else if (args.Path == "BlogEditor")
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    new[] { "RazorBlogEditor.dll" });
+                lazyLoadedAssemblies.AddRange(assemblies);
+            }
         }
         catch (Exception ex)
         {
