@@ -34,7 +34,7 @@
     {
         try
         {
-            if (args.Path == "Wordle")
+            if (args.Path.StartsWith("Wordle"))
             {
                 var assemblies = await AssemblyLoader.LoadAssembliesAsync(
                     new[] { "RazorWordle.dll" });
