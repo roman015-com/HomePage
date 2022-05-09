@@ -21,18 +21,27 @@
 
     protected override void OnInitialized()
     {
-        if(string.IsNullOrEmpty(localStorage.GetItem<string>("IsCookiesAccepted"))
-            || localStorage.GetItem<string>("IsCookiesAccepted") != "true")
+        try
         {
-            localStorage.SetItem("IsCookiesAccepted", "false");
-        }
+            if(string.IsNullOrEmpty(localStorage.GetItem<string>("IsCookiesAccepted"))
+            || localStorage.GetItem<bool>("IsCookiesAccepted") != true)
+            {
+                localStorage.SetItem<bool>("IsCookiesAccepted", false);
+            }
 
-        IsCookiesAccepted = localStorage.GetItem<bool>("IsCookiesAccepted");
+            IsCookiesAccepted = localStorage.GetItem<bool>("IsCookiesAccepted");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine("Cookie Notifier: " + e.Message);
+            localStorage.SetItem<bool>("IsCookiesAccepted", false);
+        }
     }
+    
 
     private void OnCookiesAccepted()
     {
-        localStorage.SetItem("IsCookiesAccepted", "true");
+        localStorage.SetItem<bool>("IsCookiesAccepted", true);
         IsCookiesAccepted = true;
     }
 }
