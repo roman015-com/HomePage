@@ -40,6 +40,12 @@
                     new[] { "RazorWordle.dll" });
                 lazyLoadedAssemblies.AddRange(assemblies);
             }
+            else if (args.Path.StartsWith("DutchBlitz"))
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    new[] { "RazorDutchBlitzScorecard.dll" });
+                lazyLoadedAssemblies.AddRange(assemblies);
+            }
             else if (new string[] { 
                     "DummyFile"
                     ,"GuessTheNumber"
